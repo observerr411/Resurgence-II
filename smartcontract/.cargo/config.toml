@@ -1,0 +1,20 @@
+name = "resurgence-contracts"
+version = "1.0.0"
+edition = "2021"
+
+# Rust version for Soroban contracts
+# This should match the version used by Soroban CLI
+
+[build]
+target-dir = "target"
+
+# Build configuration for WebAssembly compilation
+[profile.release]
+# Strip all symbols to reduce binary size
+strip = true
+# Link-time optimization
+lto = true
+# Single compilation unit
+codegen-units = 1
+# Optimize for size
+opt-level = "z"

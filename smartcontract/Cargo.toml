@@ -1,0 +1,50 @@
+[package]
+name = "resurgence-contracts"
+version = "1.0.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+soroban-sdk = { version = "21.0.0", features = ["contract", "events"] }
+soroban-auth = "21.0.0"
+soroban-token = { version = "21.0.0", optional = true }
+soroban-spec-tools = { version = "21.0.0" }
+
+[dev-dependencies]
+soroban-sdk = { version = "21.0.0", features = ["contract", "events", "testutils"] }
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+strip = true
+
+[profile.test]
+opt-level = 3
+
+[[bin]]
+name = "aid_registry"
+path = "src/aid_registry.rs"
+
+[[bin]]
+name = "beneficiary_manager"
+path = "src/beneficiary_manager.rs"
+
+[[bin]]
+name = "merchant_network"
+path = "src/merchant_network.rs"
+
+[[bin]]
+name = "cash_transfer"
+path = "src/cash_transfer.rs"
+
+[[bin]]
+name = "supply_chain_tracker"
+path = "src/supply_chain_tracker.rs"
+
+[[bin]]
+name = "anti_fraud"
+path = "src/anti_fraud.rs"

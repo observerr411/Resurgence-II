@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: resurgence-postgres
+    environment:
+      POSTGRES_USER: resurgence_user
+      POSTGRES_PASSWORD: resurgence_password
+      POSTGRES_DB: resurgence_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U resurgence_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: resurgence-backend
+    environment:
+      DATABASE_URL: postgresql://resurgence_user:resurgence_password@postgres:5432/resurgence_db
+      NODE_ENV: development
+      PORT: 3001
+      STELLAR_NETWORK: testnet
+      STELLAR_RPC_URL: https://soroban-testnet.stellar.org
+      STELLAR_HORIZON_URL: https://horizon-testnet.stellar.org
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend/src:/app/src
+    command: npm run dev
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: resurgence-frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:3001
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./app:/app/app
+      - ./components:/app/components
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  default:
+    name: resurgence-network
+    driver: bridge
